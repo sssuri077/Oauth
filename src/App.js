@@ -1,21 +1,28 @@
 import React from 'react';
-import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
+import axios from "axios"
 
 const App = () => {
-  const responseMessage = (response) => {
-    console.log(response);
-  };
-  
-  const errorMessage = (error) => {
-    console.log(error);
-  };
+
+  const login = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        let res = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: {
+            Authorization: `Bearer ${response.access_token}`
+          }
+        })
+
+        console.log(res, "rr");
+      } catch (error) {
+        console.log(error, "error");
+      }
+    },
+    // scope : ["https://www.googleapis.com/auth/userinfo.email", "openid"]
+  });
 
   return (
-    <div>
-      <GoogleOAuthProvider clientId="597268319238-2ajserchhhu55o9na1fnotg4hb6nl4ll.apps.googleusercontent.com">
-        <GoogleLogin onSuccess={responseMessage} onError={errorMessage} />
-      </GoogleOAuthProvider>
-    </div>
+    <button onClick={() => login()}>Sign in with Google 🚀</button>
   );
 };
 
